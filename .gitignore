@@ -3,6 +3,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+tools/apply-course-commit.ps1
 
 ### STS ###
 .apt_generated

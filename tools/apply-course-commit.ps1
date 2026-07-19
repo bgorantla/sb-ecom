@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-Copies the full files changed by a GitHub commit into this repository.
+Copies the full files changed by a GitHub commit into this repository and removes files deleted by that commit.
 
 .EXAMPLE
 powershell -ExecutionPolicy Bypass -File .\tools\apply-course-commit.ps1 https://github.com/EmbarkXOfficial/spring-boot-course/commit/<sha>
 
 .EXAMPLE
-powershell -ExecutionPolicy Bypass -File .\tools\apply-course-commit.ps1 https://github.com/EmbarkXOfficial/spring-boot-course/commit/<sha> -RemoveDeletedFiles
+powershell -ExecutionPolicy Bypass -File .\tools\apply-course-commit.ps1 https://github.com/EmbarkXOfficial/spring-boot-course/commit/<sha> -KeepDeletedFiles
 #>
 
 [CmdletBinding()]
@@ -16,11 +16,17 @@ param(
 
     [switch]$Force,
 
-    [switch]$RemoveDeletedFiles
+    [switch]$RemoveDeletedFiles,
+
+    [switch]$KeepDeletedFiles
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+if ($RemoveDeletedFiles -and $KeepDeletedFiles) {
+    throw "Use either -RemoveDeletedFiles or -KeepDeletedFiles, not both."
+}
 
 function Get-GitOutput {
     param(
@@ -51,6 +57,33 @@ function Test-GitCommit {
 
     & git cat-file -e "$Spec^{commit}" 2>$null
     return $LASTEXITCODE -eq 0
+}
+
+function Test-GitTrackedPath {
+    param([string]$RelativePath)
+
+    $tracked = @(Get-GitOutput -Arguments @('ls-files', '--', $RelativePath))
+    return $tracked.Count -gt 0
+}
+
+function Test-GitPathDirty {
+    param([string]$RelativePath)
+
+    & git diff --quiet -- $RelativePath
+    $worktreeExitCode = $LASTEXITCODE
+
+    if ($worktreeExitCode -gt 1) {
+        throw "git diff failed for $RelativePath."
+    }
+
+    & git diff --cached --quiet -- $RelativePath
+    $indexExitCode = $LASTEXITCODE
+
+    if ($indexExitCode -gt 1) {
+        throw "git diff --cached failed for $RelativePath."
+    }
+
+    return ($worktreeExitCode -eq 1 -or $indexExitCode -eq 1)
 }
 
 function Get-SafeFullPath {
@@ -291,8 +324,10 @@ foreach ($line in $statusLines) {
             throw "Could not parse rename row: $line"
         }
 
-        if ($RemoveDeletedFiles) {
+        if (-not $KeepDeletedFiles) {
             $deleteList.Add($parts[1]) | Out-Null
+        } else {
+            $skippedDeletes.Add($parts[1]) | Out-Null
         }
 
         $restoreList.Add($parts[2]) | Out-Null
@@ -303,7 +338,7 @@ foreach ($line in $statusLines) {
 
         $restoreList.Add($parts[2]) | Out-Null
     } elseif ($status -eq 'D') {
-        if ($RemoveDeletedFiles) {
+        if (-not $KeepDeletedFiles) {
             $deleteList.Add($parts[1]) | Out-Null
         } else {
             $skippedDeletes.Add($parts[1]) | Out-Null
@@ -349,9 +384,27 @@ foreach ($item in @($restoreItems + $deleteItems)) {
 if (-not $Force) {
     $blockedPaths = New-Object System.Collections.Generic.List[string]
 
-    foreach ($item in @($restoreItems + $deleteItems)) {
-        $pathStatus = @(Get-GitOutput -Arguments @('status', '--porcelain', '--', $item.LocalPath))
-        if ($pathStatus.Count -gt 0) {
+    foreach ($item in $restoreItems) {
+        $fullPath = Get-SafeFullPath -Root $repoRoot -RelativePath $item.LocalPath
+        $isTracked = Test-GitTrackedPath -RelativePath $item.LocalPath
+
+        if ($isTracked -and (Test-GitPathDirty -RelativePath $item.LocalPath)) {
+            $blockedPaths.Add($item.LocalPath) | Out-Null
+        } elseif (-not $isTracked -and (Test-Path -LiteralPath $fullPath)) {
+            $blockedPaths.Add($item.LocalPath) | Out-Null
+        }
+    }
+
+    foreach ($item in $deleteItems) {
+        $fullPath = Get-SafeFullPath -Root $repoRoot -RelativePath $item.LocalPath
+
+        if (-not (Test-Path -LiteralPath $fullPath)) {
+            continue
+        }
+
+        $isTracked = Test-GitTrackedPath -RelativePath $item.LocalPath
+
+        if (-not $isTracked -or (Test-GitPathDirty -RelativePath $item.LocalPath)) {
             $blockedPaths.Add($item.LocalPath) | Out-Null
         }
     }
@@ -386,7 +439,7 @@ Write-Host ""
 Write-Host "Done. Copied $($restorePaths.Count) file(s) from $($resolvedCommit.Substring(0, 12))."
 
 if ($skippedDeletes.Count -gt 0) {
-    Write-Host "Skipped $($skippedDeletes.Count) deleted file(s). Rerun with -RemoveDeletedFiles if you want deletions applied too."
+    Write-Host "Skipped $($skippedDeletes.Count) deleted file(s). Rerun without -KeepDeletedFiles if you want deletions applied too."
 }
 
 Write-Host "Review the result with: git diff --stat"
