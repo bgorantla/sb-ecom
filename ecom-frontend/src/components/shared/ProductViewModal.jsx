@@ -1,15 +1,19 @@
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import { Button, Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { Divider } from '@mui/material';
+import { useState } from 'react'
 import Status from './Status';
 import { MdClose, MdDone } from 'react-icons/md';
 
 function ProductViewModal({open, setOpen, product, isAvailable}) {
   
-  const {productName, image, description, price, specialPrice} = product || {};
+  const {id, productName, image, description, quantity, price, discount, specialPrice} = product;
+  const handleClickOpen = () => {
+    setOpen(true);
+  }
 
   return (
     <>
-      <Dialog open={open} as="div" className="relative z-10" onClose={() => setOpen(false)}>
+      <Dialog open={open} as="div" className="relative z-10" onClose={close}>
       <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
