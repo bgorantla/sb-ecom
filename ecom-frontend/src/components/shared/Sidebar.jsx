@@ -3,7 +3,6 @@ import { FaTachometerAlt } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom'
 import { adminNavigation } from '../../utils';
-import classNames from 'classnames';
 
 const Sidebar = ({isProfileLayout = false}) => {
     const pathName = useLocation().pathname;
@@ -27,12 +26,11 @@ const Sidebar = ({isProfileLayout = false}) => {
                             <li key={item.name}>
                                 <Link
                                     to={item.href}
-                                    className={classNames(
+                                    className={`group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ${
                                         pathName === item.href
                                             ? "bg-custom-blue text-white"
-                                            : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                                        "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
-                                    )}>
+                                            : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                                    }`}>
 
                                         <item.icon className='text-2xl'/>
                                         {item.name}
