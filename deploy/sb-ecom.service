@@ -1,0 +1,25 @@
+[Unit]
+Description=sb-ecom Spring Boot backend
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+# Don't try to start until deploy.sh has uploaded the jar
+ConditionPathExists=/opt/sb-ecom/app.jar
+
+[Service]
+User=sbecom
+Group=sbecom
+# Uploaded product images are saved to ./images, i.e. /opt/sb-ecom/images
+WorkingDirectory=/opt/sb-ecom
+EnvironmentFile=/etc/sb-ecom.env
+# Sized for a 1 GB instance: small heap, serial GC, C1-only JIT.
+# Listens on localhost only; Nginx is the only way in.
+ExecStart=/usr/bin/java -Xms128m -Xmx320m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Xss512k -XX:+ExitOnOutOfMemoryError \
+  -jar /opt/sb-ecom/app.jar \
+  --server.address=127.0.0.1 --server.port=8080 --server.forward-headers-strategy=native
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
