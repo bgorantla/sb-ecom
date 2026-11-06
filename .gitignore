@@ -14,3 +14,6 @@ sb-ecom/target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Patch files from Claude, applied with `git apply`
+/patches/

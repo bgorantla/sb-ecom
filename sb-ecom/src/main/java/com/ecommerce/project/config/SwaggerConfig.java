@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
@@ -27,17 +26,17 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Spring Boot eCommerce API")
+                        .title("E-Shop API")
                         .version("1.0")
-                        .description("This is a Spring Boot Project for eCommerce")
-                        .license(new License().name("Our License Link").url("http://embarkx.com"))
+                        .description("REST API for E-Shop, a Spring Boot + React online store. "
+                                + "Log in through /api/auth/signin; the JWT comes back as a cookie, "
+                                + "or can be sent as a Bearer token.")
                         .contact(new Contact()
-                                .name("Faisal Memon")
-                                .email("faisal@embarkx.com")
-                                .url("https://github.com/EmbarkxOfficial")))
+                                .name("Bhargav Gorantla")
+                                .url("https://github.com/bgorantla")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("Project Documentation")
-                        .url("http://embarkx.com"))
+                        .description("Source code and README")
+                        .url("https://github.com/bgorantla/sb-ecom"))
                 .components(new Components()
                         .addSecuritySchemes("Bearer Authentication", bearerScheme))
                 .addSecurityItem(bearerRequirement);
