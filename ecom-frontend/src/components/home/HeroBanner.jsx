@@ -47,13 +47,13 @@ const HeroBanner = () => {
                                         </p>
                                         <Link 
                                             className='mt-6 inline-block bg-black text-white py-2 px-4 rounded hover:bg-gray-800'
-                                            to="/products">
+                                            to={`/products?category=${encodeURIComponent(item.category)}`}>
                                         Shop
                                         </Link>
                                     </div>
                                 </div>
                                 <div className='w-full flex justify-center lg:w-1/2 p-4'>
-                                    <img src={item?.image}></img>
+                                    <img src={item?.image} alt={item.subtitle}></img>
                                 </div>
                                 </div>
                             </div>

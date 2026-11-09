@@ -5,7 +5,7 @@ export const siteInfo = {
     ownerName: "Bhargav Gorantla",
     githubProfileUrl: "https://github.com/bgorantla",
     repoUrl: "https://github.com/bgorantla/sb-ecom",
-    linkedinUrl: "", // e.g. "https://www.linkedin.com/in/bhargav-gorantla-44a654207/"
+    linkedinUrl: "https://www.linkedin.com/in/bhargav-gorantla-44a654207/",
     email: "",       // shown publicly if set, so think about spam before adding it
     courseUrl: "https://github.com/EmbarkXOfficial/spring-boot-course",
 };

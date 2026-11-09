@@ -1,0 +1,6 @@
+[Unit]
+Description=Reset the sb-ecom demo store to its saved snapshot
+
+[Service]
+Type=oneshot
+ExecStart=/opt/sb-ecom/demo/reset.sh

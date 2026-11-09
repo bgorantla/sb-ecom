@@ -10,6 +10,12 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="E-Shop · Spring Boot + React store" />
     <meta property="og:description" content="A full-stack online store built with Spring Boot, React and PostgreSQL, deployed on AWS." />
+    <!-- Link previews need a full URL; Vite fills in %VITE_FRONTEND_URL% from .env.production at build time -->
+    <meta property="og:url" content="%VITE_FRONTEND_URL%" />
+    <meta property="og:image" content="%VITE_FRONTEND_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <div id="root"></div>

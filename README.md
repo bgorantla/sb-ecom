@@ -6,6 +6,10 @@ Shoppers browse and pay, sellers manage their own products, and admins run the c
 **Live site:** https://d1loonx3il11ot.cloudfront.net
 · **API docs:** https://d1loonx3il11ot.cloudfront.net/swagger-ui/index.html
 
+**Try it:** on the login page, **Try as shopper** creates a throwaway account just for you, and
+**Try as admin** opens the admin panel read-only. Payments use Stripe's test mode: pay with card
+`4242 4242 4242 4242`, any future date and any CVC. The store resets every night.
+
 ## Features
 
 | Shoppers | Sellers | Admins |
@@ -51,7 +55,18 @@ Changes since then:
 - **Fixed the frontend build**: added the missing Vite React config (pages crashed with
   "React is not defined") and moved the styles to Tailwind CSS v4 syntax
 - **Replaced the course placeholders** with an About page describing the project, a real Contact page,
-  a site footer, page metadata and a favicon
+  a site footer, page metadata, a favicon and a link-preview image
+- **Public demo mode** ([demo package](sb-ecom/src/main/java/com/ecommerce/project/demo/)):
+  - one-click demo logins: each shopper gets their own throwaway account
+  - a shared demo admin that a Spring Security filter keeps read-only
+  - a nightly reset to a saved snapshot, run by a systemd timer
+  - a test-card banner
+- **A real catalog**: 35 products in 5 categories, loaded through the app's own REST API by
+  [a seed script](deploy/demo/seed_catalog.py)
+- **Fixed checkout for shoppers**: the route guard sent anyone without an admin or seller role
+  away from checkout. Logging in now also returns you to the page you were on.
+- **Smaller fixes**: home banners whose text didn't match their pictures, stretched product photos,
+  the 1 MB upload limit, and startup accounts with public passwords (now configurable and off on the server)
 
 ## Running it locally
 
@@ -74,8 +89,9 @@ export STRIPE_SECRET_KEY=sk_test_...
 ```
 
 `DB_URL` and `DB_USERNAME` default to `jdbc:postgresql://localhost:5432/ecommerce` and `postgres`.
-On startup the app creates three demo users (`user1`, `seller1`, `admin`); their passwords are in
-`WebSecurityConfig.java`.
+On startup the app creates `admin` (password `adminPass`, or `ADMIN_PASSWORD` if set) and, for local
+development, `user1` / `password1` and `seller1` / `password2`. Set `DEMO_MODE=true` to try the demo
+buttons and banner locally.
 
 **Frontend** (port 5173). Create `ecom-frontend/.env.development.local`:
 
@@ -102,3 +118,8 @@ sb-ecom/          Spring Boot backend
 ecom-frontend/    React frontend
 deploy/           AWS server setup and deploy scripts
 ```
+
+## Credits
+
+- Started from the [EmbarkX Spring Boot course](https://github.com/EmbarkXOfficial/spring-boot-course) project
+- Demo product data and photos from [DummyJSON](https://dummyjson.com) (MIT License)

@@ -20,6 +20,7 @@ import Sellers from './components/admin/sellers/Sellers'
 import Category from './components/admin/categories/Category'
 import Orders from './components/admin/orders/Orders'
 import Footer from './components/shared/Footer'
+import DemoBanner from './components/shared/DemoBanner'
 
 function App() {
   return (
@@ -27,7 +28,8 @@ function App() {
       <Router>
         <div className='min-h-screen flex flex-col'>
           <Navbar />
-          <main className='flex-1'>
+          <DemoBanner />
+          <div className='flex-1'>
             <Routes>
               <Route path='/' element={ <Home />}/>
               <Route path='/products' element={ <Products />}/>
@@ -55,7 +57,7 @@ function App() {
                 </Route>
               </Route>
             </Routes>
-          </main>
+          </div>
           <Footer />
         </div>
       </Router>

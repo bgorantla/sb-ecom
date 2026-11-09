@@ -4,9 +4,14 @@ import { Outlet } from 'react-router-dom'
 import { Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react';
 import { RxCross1 } from 'react-icons/rx';
 import { FaBars } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import useDemoInfo from '../../hooks/useDemoInfo';
 
 const AdminLayout = () => {
     let [sidebarOpen, setSidebarOpen] = useState(false);
+    const demo = useDemoInfo();
+    const { user } = useSelector((state) => state.auth);
+    const isDemoAdmin = demo.enabled && user?.username === demo.adminUsername;
   return (
     <div>
         <Dialog 
@@ -56,6 +61,12 @@ const AdminLayout = () => {
 
             <main className=''>
                 <div className='p-4 sm:p-6 xl:p-8'>
+                    {isDemoAdmin && (
+                        <div className='mb-6 rounded-md bg-amber-100 text-amber-900 text-sm px-4 py-3'>
+                            You&apos;re signed in as the read-only demo admin. Look around as much as you
+                            like; saving changes is turned off.
+                        </div>
+                    )}
                     <Outlet />
                 </div>
                 

@@ -20,8 +20,11 @@ and the frontend is built with an empty `VITE_BACK_END_URL` (it calls `/api` on 
 | `server-setup.sh` | server, once | Swap, Java 21, PostgreSQL, Nginx, app user, `/etc/sb-ecom.env` with generated secrets, service + site |
 | `deploy.sh` | laptop, every deploy | Builds jar + frontend, uploads, restarts, waits for the API |
 | `copy-local-data.sh` | laptop, optional | Replaces the server DB and images with your local ones |
-| `fix-and-push.sh` | laptop, once | New Stripe keys in the right places, redeploy, remove stray files, commit + push |
-| `change-password.sh` | laptop | Sets a user's password in the server DB (do this for `admin` and `seller1`) |
+| `demo-setup.sh` | laptop, once | Turns on demo mode, adds the catalog, installs the nightly reset (runs `demo/install.sh` on the server) |
+| `demo/seed_catalog.py` | server | Adds the products in `demo/catalog.json` through the REST API |
+| `demo/save-snapshot.sh` | server | Saves the store as the state the nightly reset returns to |
+| `demo/reset.sh` | server, nightly | Restores that snapshot (run by `sb-ecom-demo-reset.timer` at 08:00 UTC) |
+| `change-password.sh` | laptop | Sets a user's password in the server DB (e.g. `admin`) |
 | `sb-ecom.service` | server | systemd unit, heap sized for 1 GB RAM |
 | `nginx-sb-ecom.conf` | server | Static files + reverse proxy |
 | `frontend.env.production` | laptop | Template: copy to `ecom-frontend/.env.production` and fill in |
@@ -34,12 +37,19 @@ ssh sb-ecom 'sudo journalctl -u sb-ecom -f'                    # live backend lo
 ssh sb-ecom 'sudo systemctl restart sb-ecom'                   # restart after editing /etc/sb-ecom.env
 ssh sb-ecom 'sudo -u postgres psql ecommerce'                  # SQL shell on the live DB
 ssh sb-ecom 'sudo -u postgres pg_dump ecommerce' > backup.sql  # back up the live DB
+ssh sb-ecom 'sudo /opt/sb-ecom/demo/reset.sh'                  # reset the demo store now
+ssh sb-ecom 'sudo /opt/sb-ecom/demo/save-snapshot.sh'          # keep catalog changes you made as admin
 ```
+
+The store goes back to its saved snapshot every night. If you change the catalog on purpose
+(as your own `admin`), run `save-snapshot.sh` afterwards or the next reset will undo it.
 
 ## Where things live on the server
 
 - App jar: `/opt/sb-ecom/app.jar`, uploaded product images: `/opt/sb-ecom/images/`
-- Secrets and settings: `/etc/sb-ecom.env` (DB password, JWT secret, Stripe key, CloudFront URL)
+- Secrets and settings: `/etc/sb-ecom.env` (DB password, JWT secret, Stripe key, CloudFront URL,
+  `DEMO_MODE`, `SEED_SAMPLE_USERS`, `ADMIN_PASSWORD` for when the admin account is first created)
+- Demo snapshot and reset scripts: `/opt/sb-ecom/demo/`
 - Frontend: `/var/www/sb-ecom/`
 - Nginx site: `/etc/nginx/sites-available/sb-ecom`
 

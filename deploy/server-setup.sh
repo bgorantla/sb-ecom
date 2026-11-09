@@ -37,6 +37,8 @@ if sudo test -f /etc/sb-ecom.env; then
 else
   DB_PASSWORD="$(openssl rand -hex 24)"
   JWT_SECRET="$(openssl rand -base64 32)"
+  ADMIN_PASSWORD="$(openssl rand -hex 12)"
+  NEW_ADMIN_PASSWORD="$ADMIN_PASSWORD"
   sudo install -m 640 -o root -g sbecom /dev/null /etc/sb-ecom.env
   sudo tee /etc/sb-ecom.env >/dev/null <<EOF
 # Environment for the sb-ecom service. After editing: sudo systemctl restart sb-ecom
@@ -47,6 +49,11 @@ JWT_SECRET=${JWT_SECRET}
 STRIPE_SECRET_KEY=sk_test_REPLACE_ME
 FRONTEND_URL=https://REPLACE_ME.cloudfront.net
 IMAGE_BASE_URL=/images
+# Password for the "admin" account, used only when the app first creates it
+ADMIN_PASSWORD=${ADMIN_PASSWORD}
+# Public demo: read-only demo admin + test-mode banner; no user1/seller1 accounts
+DEMO_MODE=true
+SEED_SAMPLE_USERS=false
 EOF
 fi
 
@@ -74,6 +81,11 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t -q
 sudo systemctl reload nginx
 
+if [ -n "${NEW_ADMIN_PASSWORD:-}" ]; then
+  echo
+  echo "Your site's admin login will be: admin / $NEW_ADMIN_PASSWORD  (also in /etc/sb-ecom.env)"
+fi
+
 cat <<'MSG'
 
 Server is ready. Next:
@@ -81,4 +93,5 @@ Server is ready. Next:
        - STRIPE_SECRET_KEY = your sk_test_... key
        - FRONTEND_URL      = your CloudFront address (once you've created it)
   2. On your laptop, from the project folder: bash deploy/deploy.sh sb-ecom
+  3. Then add the demo catalog and nightly reset: bash deploy/demo-setup.sh sb-ecom
 MSG

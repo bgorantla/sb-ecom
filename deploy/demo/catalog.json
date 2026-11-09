@@ -1,0 +1,355 @@
+{
+  "source": "Product data and photos from DummyJSON (https://dummyjson.com, MIT License)",
+  "products": [
+    {
+      "name": "iPhone 13 Pro",
+      "category": "Electronics",
+      "description": "The iPhone 13 Pro is a cutting-edge smartphone with a powerful camera system, high-performance chip, and stunning display. It offers advanced features for users who demand top-notch technology.",
+      "price": 1099.99,
+      "discount": 9,
+      "quantity": 56,
+      "image": "https://cdn.dummyjson.com/product-images/smartphones/iphone-13-pro/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/smartphones/iphone-13-pro/thumbnail.webp"
+    },
+    {
+      "name": "Samsung Galaxy S10",
+      "category": "Electronics",
+      "description": "The Samsung Galaxy S10 is a flagship device featuring a dynamic AMOLED display, versatile camera system, and powerful performance. It represents innovation and excellence in smartphone technology.",
+      "price": 699.99,
+      "discount": 6,
+      "quantity": 19,
+      "image": "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s10/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s10/thumbnail.webp"
+    },
+    {
+      "name": "Oppo F19 Pro Plus",
+      "category": "Electronics",
+      "description": "The Oppo F19 Pro Plus is a feature-rich smartphone with a focus on camera capabilities. It boasts advanced photography features and a powerful performance for a premium user experience.",
+      "price": 399.99,
+      "discount": 19,
+      "quantity": 78,
+      "image": "https://cdn.dummyjson.com/product-images/smartphones/oppo-f19-pro-plus/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/smartphones/oppo-f19-pro-plus/thumbnail.webp"
+    },
+    {
+      "name": "Apple MacBook Pro 14-inch Space Grey",
+      "category": "Electronics",
+      "description": "The MacBook Pro 14 Inch in Space Grey is a powerful and sleek laptop, featuring Apple's M1 Pro chip for exceptional performance and a stunning Retina display.",
+      "price": 1999.99,
+      "discount": 5,
+      "quantity": 24,
+      "image": "https://cdn.dummyjson.com/product-images/laptops/apple-macbook-pro-14-inch-space-grey/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/laptops/apple-macbook-pro-14-inch-space-grey/thumbnail.webp"
+    },
+    {
+      "name": "Dell XPS 13 9300 Laptop",
+      "category": "Electronics",
+      "description": "The New DELL XPS 13 9300 Laptop is a compact and powerful device, featuring a virtually borderless InfinityEdge display and high-end performance for various tasks.",
+      "price": 1499.99,
+      "discount": 12,
+      "quantity": 74,
+      "image": "https://cdn.dummyjson.com/product-images/laptops/new-dell-xps-13-9300-laptop/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/laptops/new-dell-xps-13-9300-laptop/thumbnail.webp"
+    },
+    {
+      "name": "iPad Mini 2021 Starlight",
+      "category": "Electronics",
+      "description": "The iPad Mini 2021 in Starlight is a compact and powerful tablet from Apple. Featuring a stunning Retina display, powerful A-series chip, and a sleek design, it offers a premium tablet experience.",
+      "price": 499.99,
+      "discount": 4,
+      "quantity": 47,
+      "image": "https://cdn.dummyjson.com/product-images/tablets/ipad-mini-2021-starlight/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/tablets/ipad-mini-2021-starlight/thumbnail.webp"
+    },
+    {
+      "name": "Apple AirPods Max Silver",
+      "category": "Electronics",
+      "description": "The Apple AirPods Max in Silver are premium over-ear headphones with high-fidelity audio, adaptive EQ, and active noise cancellation. Experience immersive sound in style.",
+      "price": 549.99,
+      "discount": 14,
+      "quantity": 59,
+      "image": "https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpods-max-silver/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpods-max-silver/thumbnail.webp"
+    },
+    {
+      "name": "Amazon Echo Plus",
+      "category": "Electronics",
+      "description": "The Amazon Echo Plus is a smart speaker with built-in Alexa voice control. It features premium sound quality and serves as a hub for controlling smart home devices.",
+      "price": 99.99,
+      "discount": 12,
+      "quantity": 61,
+      "image": "https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/thumbnail.webp"
+    },
+    {
+      "name": "Annibale Colombo Sofa",
+      "category": "Home & Living",
+      "description": "The Annibale Colombo Sofa is a sophisticated and comfortable seating option, featuring exquisite design and premium upholstery for your living room.",
+      "price": 2499.99,
+      "discount": 14,
+      "quantity": 60,
+      "image": "https://cdn.dummyjson.com/product-images/furniture/annibale-colombo-sofa/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/furniture/annibale-colombo-sofa/thumbnail.webp"
+    },
+    {
+      "name": "Bedside Table African Cherry",
+      "category": "Home & Living",
+      "description": "The Bedside Table in African Cherry is a stylish and functional addition to your bedroom, providing convenient storage space and a touch of elegance.",
+      "price": 299.99,
+      "discount": 19,
+      "quantity": 64,
+      "image": "https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/thumbnail.webp"
+    },
+    {
+      "name": "Knoll Saarinen Executive Conference Chair",
+      "category": "Home & Living",
+      "description": "The Knoll Saarinen Executive Conference Chair is a modern and ergonomic chair, perfect for your office or conference room with its timeless design.",
+      "price": 499.99,
+      "discount": 2,
+      "quantity": 26,
+      "image": "https://cdn.dummyjson.com/product-images/furniture/knoll-saarinen-executive-conference-chair/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/furniture/knoll-saarinen-executive-conference-chair/thumbnail.webp"
+    },
+    {
+      "name": "Table Lamp",
+      "category": "Home & Living",
+      "description": "The Table Lamp is a functional and decorative lighting solution for your living space. With a modern design, it provides both ambient and task lighting, enhancing the atmosphere.",
+      "price": 49.99,
+      "discount": 7,
+      "quantity": 12,
+      "image": "https://cdn.dummyjson.com/product-images/home-decoration/table-lamp/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/home-decoration/table-lamp/thumbnail.webp"
+    },
+    {
+      "name": "House Showpiece Plant",
+      "category": "Home & Living",
+      "description": "The House Showpiece Plant is an artificial plant that brings a touch of nature to your home without the need for maintenance. It adds greenery and style to any space.",
+      "price": 39.99,
+      "discount": 7,
+      "quantity": 28,
+      "image": "https://cdn.dummyjson.com/product-images/home-decoration/house-showpiece-plant/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/home-decoration/house-showpiece-plant/thumbnail.webp"
+    },
+    {
+      "name": "Family Tree Photo Frame",
+      "category": "Home & Living",
+      "description": "The Family Tree Photo Frame is a sentimental and stylish way to display your cherished family memories. With multiple photo slots, it tells the story of your loved ones.",
+      "price": 29.99,
+      "discount": 15,
+      "quantity": 77,
+      "image": "https://cdn.dummyjson.com/product-images/home-decoration/family-tree-photo-frame/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/home-decoration/family-tree-photo-frame/thumbnail.webp"
+    },
+    {
+      "name": "Decoration Swing",
+      "category": "Home & Living",
+      "description": "The Decoration Swing is a charming addition to your home decor. Crafted with intricate details, it adds a touch of elegance and whimsy to any room.",
+      "price": 59.99,
+      "discount": 10,
+      "quantity": 47,
+      "image": "https://cdn.dummyjson.com/product-images/home-decoration/decoration-swing/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/home-decoration/decoration-swing/thumbnail.webp"
+    },
+    {
+      "name": "Boxed Blender",
+      "category": "Kitchen",
+      "description": "The Boxed Blender is a powerful and compact blender perfect for smoothies, shakes, and more. Its convenient design and multiple functions make it a versatile kitchen appliance.",
+      "price": 39.99,
+      "discount": 7,
+      "quantity": 12,
+      "image": "https://cdn.dummyjson.com/product-images/kitchen-accessories/boxed-blender/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/kitchen-accessories/boxed-blender/thumbnail.webp"
+    },
+    {
+      "name": "Microwave Oven",
+      "category": "Kitchen",
+      "description": "The Microwave Oven is a versatile kitchen appliance for quick and efficient cooking, reheating, and defrosting. Its compact size makes it suitable for various kitchen setups.",
+      "price": 89.99,
+      "discount": 12,
+      "quantity": 59,
+      "image": "https://cdn.dummyjson.com/product-images/kitchen-accessories/microwave-oven/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/kitchen-accessories/microwave-oven/thumbnail.webp"
+    },
+    {
+      "name": "Carbon Steel Wok",
+      "category": "Kitchen",
+      "description": "The Carbon Steel Wok is a versatile cooking pan suitable for stir-frying, sautéing, and deep frying. Its sturdy construction ensures even heat distribution for delicious meals.",
+      "price": 29.99,
+      "discount": 7,
+      "quantity": 40,
+      "image": "https://cdn.dummyjson.com/product-images/kitchen-accessories/carbon-steel-wok/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/kitchen-accessories/carbon-steel-wok/thumbnail.webp"
+    },
+    {
+      "name": "Silver Pot With Glass Cap",
+      "category": "Kitchen",
+      "description": "The Silver Pot with Glass Cap is a stylish and functional cookware item for boiling, simmering, and preparing delicious meals. Its glass cap allows you to monitor cooking progress.",
+      "price": 39.99,
+      "discount": 6,
+      "quantity": 40,
+      "image": "https://cdn.dummyjson.com/product-images/kitchen-accessories/silver-pot-with-glass-cap/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/kitchen-accessories/silver-pot-with-glass-cap/thumbnail.webp"
+    },
+    {
+      "name": "Spice Rack",
+      "category": "Kitchen",
+      "description": "The Spice Rack is a convenient organizer for your spices and seasonings. Keep your kitchen essentials within reach and neatly arranged with this stylish spice rack.",
+      "price": 19.99,
+      "discount": 12,
+      "quantity": 79,
+      "image": "https://cdn.dummyjson.com/product-images/kitchen-accessories/spice-rack/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/kitchen-accessories/spice-rack/thumbnail.webp"
+    },
+    {
+      "name": "Chopping Board",
+      "category": "Kitchen",
+      "description": "The Chopping Board is an essential kitchen accessory for food preparation. Made from durable material, it provides a safe and hygienic surface for cutting and chopping.",
+      "price": 12.99,
+      "discount": 8,
+      "quantity": 14,
+      "image": "https://cdn.dummyjson.com/product-images/kitchen-accessories/chopping-board/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/kitchen-accessories/chopping-board/thumbnail.webp"
+    },
+    {
+      "name": "Blue & Black Check Shirt",
+      "category": "Fashion",
+      "description": "The Blue & Black Check Shirt is a stylish and comfortable men's shirt featuring a classic check pattern. Made from high-quality fabric, it's suitable for both casual and semi-formal occasions.",
+      "price": 29.99,
+      "discount": 15,
+      "quantity": 38,
+      "image": "https://cdn.dummyjson.com/product-images/mens-shirts/blue-&-black-check-shirt/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mens-shirts/blue-&-black-check-shirt/thumbnail.webp"
+    },
+    {
+      "name": "Man Plaid Shirt",
+      "category": "Fashion",
+      "description": "The Man Plaid Shirt is a timeless and versatile men's shirt with a classic plaid pattern. Its comfortable fit and casual style make it a wardrobe essential for various occasions.",
+      "price": 34.99,
+      "discount": 20,
+      "quantity": 82,
+      "image": "https://cdn.dummyjson.com/product-images/mens-shirts/man-plaid-shirt/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mens-shirts/man-plaid-shirt/thumbnail.webp"
+    },
+    {
+      "name": "Black Women's Gown",
+      "category": "Fashion",
+      "description": "The Black Women's Gown is an elegant and timeless evening gown. With a sleek black design, it's perfect for formal events and special occasions, exuding sophistication and style.",
+      "price": 129.99,
+      "discount": 10,
+      "quantity": 25,
+      "image": "https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/thumbnail.webp"
+    },
+    {
+      "name": "Girls' Summer Dress",
+      "category": "Fashion",
+      "description": "The Girl Summer Dress is a cute and breezy dress designed for warm weather. With playful patterns and lightweight fabric, it's perfect for keeping cool and stylish during the summer.",
+      "price": 19.99,
+      "discount": 19,
+      "quantity": 43,
+      "image": "https://cdn.dummyjson.com/product-images/tops/girl-summer-dress/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/tops/girl-summer-dress/thumbnail.webp"
+    },
+    {
+      "name": "Puma Future Rider Trainers",
+      "category": "Fashion",
+      "description": "The Puma Future Rider Trainers offer a blend of retro style and modern comfort. Perfect for casual wear, these trainers provide a fashionable and comfortable option for everyday use.",
+      "price": 89.99,
+      "discount": 4,
+      "quantity": 90,
+      "image": "https://cdn.dummyjson.com/product-images/mens-shoes/puma-future-rider-trainers/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mens-shoes/puma-future-rider-trainers/thumbnail.webp"
+    },
+    {
+      "name": "Nike Air Jordan 1 Red And Black",
+      "category": "Fashion",
+      "description": "The Nike Air Jordan 1 in Red and Black is an iconic basketball sneaker known for its stylish design and high-performance features, making it a favorite among sneaker enthusiasts and athletes.",
+      "price": 149.99,
+      "discount": 4,
+      "quantity": 12,
+      "image": "https://cdn.dummyjson.com/product-images/mens-shoes/nike-air-jordan-1-red-and-black/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mens-shoes/nike-air-jordan-1-red-and-black/thumbnail.webp"
+    },
+    {
+      "name": "Calvin Klein Heel Shoes",
+      "category": "Fashion",
+      "description": "Calvin Klein Heel Shoes are elegant and sophisticated, designed for formal occasions. With a classic design and high-quality materials, they complement your stylish ensemble.",
+      "price": 79.99,
+      "discount": 3,
+      "quantity": 93,
+      "image": "https://cdn.dummyjson.com/product-images/womens-shoes/calvin-klein-heel-shoes/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/womens-shoes/calvin-klein-heel-shoes/thumbnail.webp"
+    },
+    {
+      "name": "Heshe Women's Leather Bag",
+      "category": "Fashion",
+      "description": "The Heshe Women's Leather Bag is a luxurious and high-quality leather bag for the sophisticated woman. With a timeless design and durable craftsmanship, it's a versatile accessory.",
+      "price": 129.99,
+      "discount": 4,
+      "quantity": 99,
+      "image": "https://cdn.dummyjson.com/product-images/womens-bags/heshe-women's-leather-bag/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/womens-bags/heshe-women's-leather-bag/thumbnail.webp"
+    },
+    {
+      "name": "Classic Sun Glasses",
+      "category": "Accessories",
+      "description": "The Classic Sun Glasses offer a timeless design with a neutral frame and UV-protected lenses. These sunglasses are versatile and suitable for various occasions.",
+      "price": 24.99,
+      "discount": 5,
+      "quantity": 12,
+      "image": "https://cdn.dummyjson.com/product-images/sunglasses/classic-sun-glasses/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/sunglasses/classic-sun-glasses/thumbnail.webp"
+    },
+    {
+      "name": "Green and Black Glasses",
+      "category": "Accessories",
+      "description": "The Green and Black Glasses feature a bold combination of green and black colors, adding a touch of vibrancy to your eyewear collection. They are both stylish and eye-catching.",
+      "price": 34.99,
+      "discount": 1,
+      "quantity": 24,
+      "image": "https://cdn.dummyjson.com/product-images/sunglasses/green-and-black-glasses/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/sunglasses/green-and-black-glasses/thumbnail.webp"
+    },
+    {
+      "name": "Brown Leather Belt Watch",
+      "category": "Accessories",
+      "description": "The Brown Leather Belt Watch is a stylish timepiece with a classic design. Featuring a genuine leather strap and a sleek dial, it adds a touch of sophistication to your look.",
+      "price": 89.99,
+      "discount": 6,
+      "quantity": 32,
+      "image": "https://cdn.dummyjson.com/product-images/mens-watches/brown-leather-belt-watch/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/mens-watches/brown-leather-belt-watch/thumbnail.webp"
+    },
+    {
+      "name": "Women's Wrist Watch",
+      "category": "Accessories",
+      "description": "The Women's Wrist Watch is a versatile and fashionable timepiece for everyday wear. With a comfortable strap and a simple yet elegant design, it complements various styles.",
+      "price": 129.99,
+      "discount": 13,
+      "quantity": 12,
+      "image": "https://cdn.dummyjson.com/product-images/womens-watches/women's-wrist-watch/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/womens-watches/women's-wrist-watch/thumbnail.webp"
+    },
+    {
+      "name": "Green Crystal Earring",
+      "category": "Accessories",
+      "description": "The Green Crystal Earring is a dazzling accessory that features a vibrant green crystal. With a classic design, it adds a touch of elegance to your ensemble, perfect for formal or special occasions.",
+      "price": 29.99,
+      "discount": 15,
+      "quantity": 54,
+      "image": "https://cdn.dummyjson.com/product-images/womens-jewellery/green-crystal-earring/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/womens-jewellery/green-crystal-earring/thumbnail.webp"
+    },
+    {
+      "name": "White Faux Leather Backpack",
+      "category": "Accessories",
+      "description": "The White Faux Leather Backpack is a trendy and practical backpack for the modern woman. With a sleek white design and ample storage space, it's perfect for both casual and on-the-go styles.",
+      "price": 39.99,
+      "discount": 15,
+      "quantity": 39,
+      "image": "https://cdn.dummyjson.com/product-images/womens-bags/white-faux-leather-backpack/1.webp",
+      "fallbackImage": "https://cdn.dummyjson.com/product-images/womens-bags/white-faux-leather-backpack/thumbnail.webp"
+    }
+  ]
+}

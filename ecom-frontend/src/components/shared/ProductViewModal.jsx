@@ -24,6 +24,7 @@ function ProductViewModal({open, setOpen, product, isAvailable}) {
                 {image && (
                     <div className='flex justify-center aspect-[3/2]'>
                     <img 
+                    className="h-full object-contain"
                     src={image}
                     alt={productName} />
                     </div>

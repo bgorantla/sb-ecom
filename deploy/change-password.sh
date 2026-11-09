@@ -25,5 +25,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 UPDATE users
    SET password = crypt(convert_from(decode(:'pw_b64', 'base64'), 'UTF8'), gen_salt('bf', 10))
  WHERE username = :'u';
+-- Only needed for this one update; removing it keeps the demo snapshots restorable
+DROP EXTENSION pgcrypto;
 SQL
 echo "If it printed UPDATE 1, the password is changed. UPDATE 0 means no user by that name."

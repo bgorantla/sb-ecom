@@ -118,7 +118,7 @@ export const removeFromCart =  (data, toast) => (dispatch, getState) => {
 
 
 export const authenticateSignInUser 
-    = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {
+    = (sendData, toast, reset, navigate, setLoader, redirectTo = "/") => async (dispatch) => {
         try {
             setLoader(true);
             const { data } = await api.post("/auth/signin", sendData);
@@ -126,7 +126,7 @@ export const authenticateSignInUser
             localStorage.setItem("auth", JSON.stringify(data));
             reset();
             toast.success("Login Success");
-            navigate("/");
+            navigate(redirectTo);
         } catch (error) {
             console.log(error);
             toast.error(error?.response?.data?.message || "Internal Server Error");
@@ -135,6 +135,24 @@ export const authenticateSignInUser
         }
 }
 
+
+// Demo: give each visitor their own throwaway shopper account, so two people trying
+// the site at the same time never share a cart. The nightly reset deletes these accounts.
+export const loginAsDemoShopper = (toast, navigate, setLoader) => async (dispatch) => {
+    const randomHex = (bytes) => Array.from(crypto.getRandomValues(new Uint8Array(bytes)),
+        (b) => b.toString(16).padStart(2, "0")).join("");
+    const username = `guest-${randomHex(3)}`;
+    const password = randomHex(12);
+    try {
+        setLoader(true);
+        await api.post("/auth/signup", { username, email: `${username}@example.com`, password });
+    } catch (error) {
+        toast.error(error?.response?.data?.message || "Couldn't create a demo account");
+        setLoader(false);
+        return;
+    }
+    await dispatch(authenticateSignInUser({ username, password }, toast, () => {}, navigate, setLoader, "/products"));
+};
 
 export const registerNewUser 
     = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {

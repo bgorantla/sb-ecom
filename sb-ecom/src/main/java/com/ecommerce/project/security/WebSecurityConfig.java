@@ -1,11 +1,14 @@
 package com.ecommerce.project.security;
 
+import com.ecommerce.project.demo.DemoReadOnlyFilter;
+import com.ecommerce.project.demo.DemoSettings;
 import com.ecommerce.project.model.AppRole;
 import com.ecommerce.project.model.Role;
 import com.ecommerce.project.model.User;
 import com.ecommerce.project.repositories.RoleRepository;
 import com.ecommerce.project.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +45,9 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+
+    @Autowired
+    private DemoSettings demoSettings;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -96,6 +102,8 @@ public class WebSecurityConfig {
         http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        // Runs after the JWT filter has identified the user; blocks changes by the demo admin
+        http.addFilterAfter(new DemoReadOnlyFilter(demoSettings), UsernamePasswordAuthenticationFilter.class);
         http.headers(headers -> headers.frameOptions(
                 frameOptions -> frameOptions.sameOrigin()));
 
@@ -114,64 +122,53 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository,
+                                      PasswordEncoder passwordEncoder,
+                                      @Value("${app.seed.admin-password}") String adminPassword,
+                                      @Value("${app.seed.sample-users}") boolean seedSampleUsers) {
         return args -> {
             // Retrieve or create roles
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
-                    .orElseGet(() -> {
-                        Role newUserRole = new Role(AppRole.ROLE_USER);
-                        return roleRepository.save(newUserRole);
-                    });
-
+                    .orElseGet(() -> roleRepository.save(new Role(AppRole.ROLE_USER)));
             Role sellerRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER)
-                    .orElseGet(() -> {
-                        Role newSellerRole = new Role(AppRole.ROLE_SELLER);
-                        return roleRepository.save(newSellerRole);
-                    });
-
+                    .orElseGet(() -> roleRepository.save(new Role(AppRole.ROLE_SELLER)));
             Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-                    .orElseGet(() -> {
-                        Role newAdminRole = new Role(AppRole.ROLE_ADMIN);
-                        return roleRepository.save(newAdminRole);
-                    });
+                    .orElseGet(() -> roleRepository.save(new Role(AppRole.ROLE_ADMIN)));
 
             Set<Role> userRoles = Set.of(userRole);
             Set<Role> sellerRoles = Set.of(sellerRole);
             Set<Role> adminRoles = Set.of(userRole, sellerRole, adminRole);
 
+            // The store owner's admin. ADMIN_PASSWORD (or "adminPass" locally) is only
+            // used when the account is first created; changing it later doesn't reset it.
+            createUserIfMissing(userRepository, passwordEncoder, "admin", "admin@example.com", adminPassword, adminRoles);
 
-            // Create users if not already present
-            if (!userRepository.existsByUserName("user1")) {
-                User user1 = new User("user1", "user1@example.com", passwordEncoder.encode("password1"));
-                userRepository.save(user1);
+            // These two have well-known passwords, so they're for local development only
+            // (SEED_SAMPLE_USERS=false on the server).
+            if (seedSampleUsers) {
+                createUserIfMissing(userRepository, passwordEncoder, "user1", "user1@example.com", "password1", userRoles);
+                createUserIfMissing(userRepository, passwordEncoder, "seller1", "seller1@example.com", "password2", sellerRoles);
             }
 
-            if (!userRepository.existsByUserName("seller1")) {
-                User seller1 = new User("seller1", "seller1@example.com", passwordEncoder.encode("password2"));
-                userRepository.save(seller1);
+            // The public demo admin. Its password is shown on the login page, which is safe
+            // because DemoReadOnlyFilter stops it from changing anything.
+            if (demoSettings.isEnabled()) {
+                String username = demoSettings.getAdminUsername();
+                createUserIfMissing(userRepository, passwordEncoder, username, username + "@example.com",
+                        demoSettings.getAdminPassword(), adminRoles);
             }
-
-            if (!userRepository.existsByUserName("admin")) {
-                User admin = new User("admin", "admin@example.com", passwordEncoder.encode("adminPass"));
-                userRepository.save(admin);
-            }
-
-            // Update roles for existing users
-            userRepository.findByUserName("user1").ifPresent(user -> {
-                user.setRoles(userRoles);
-                userRepository.save(user);
-            });
-
-            userRepository.findByUserName("seller1").ifPresent(seller -> {
-                seller.setRoles(sellerRoles);
-                userRepository.save(seller);
-            });
-
-            userRepository.findByUserName("admin").ifPresent(admin -> {
-                admin.setRoles(adminRoles);
-                userRepository.save(admin);
-            });
         };
+    }
+
+    // Creates the user if it doesn't exist yet, and makes sure it has the given roles.
+    // A new user is saved once without roles first: saving it with roles attached would make
+    // Hibernate try to insert the (already saved) roles again, which fails.
+    private void createUserIfMissing(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                                     String username, String email, String password, Set<Role> roles) {
+        User user = userRepository.findByUserName(username)
+                .orElseGet(() -> userRepository.save(new User(username, email, passwordEncoder.encode(password))));
+        user.setRoles(roles);
+        userRepository.save(user);
     }
 
 }

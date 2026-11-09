@@ -1,28 +1,32 @@
 import { FaBoxOpen, FaHome, FaShoppingCart, FaStore, FaThList } from "react-icons/fa";
 import { bannerImageOne, bannerImageThree, bannerImageTwo } from "./constant";
 
+// Each slide's "Shop" button opens its category, so these names must match categories in the store
 export const bannerLists = [
     {
         id: 1,
-        image: bannerImageOne,
+        image: bannerImageThree,
         title: "Home Comfort",
-        subtitle: "Living Room",
-        description: "Upgrade your space with cozy and stylish sofas",
-      },
-      {
+        subtitle: "Home & Living",
+        description: "Upgrade your space with cozy, stylish furniture and decor",
+        category: "Home & Living",
+    },
+    {
         id: 2,
         image: bannerImageTwo,
-        title: "Entertainment Hub",
-        subtitle: "Smart TV",
-        description: "Experience the latest in home entertainment",
-      },
-      {
+        title: "Latest Tech",
+        subtitle: "Electronics",
+        description: "Phones, laptops and gadgets for every day",
+        category: "Electronics",
+    },
+    {
         id: 3,
-        image: bannerImageThree,
-        title: "Playful Picks",
-        subtitle: "Kids' Clothing",
-        description: "Bright and fun styles for kids, up to 20% off",
-    }
+        image: bannerImageOne,
+        title: "Fresh Styles",
+        subtitle: "Fashion",
+        description: "Bright, comfortable looks for every day",
+        category: "Fashion",
+    },
 ];
 
 
