@@ -234,7 +234,8 @@ export const clearCheckoutAddress = () => {
 export const getUserAddresses = () => async (dispatch, getState) => {
     try {
         dispatch({ type: "IS_FETCHING" });
-        const { data } = await api.get(`/addresses`);
+        // Only this user's addresses (/addresses lists everyone's and is admin-only)
+        const { data } = await api.get(`/users/addresses`);
         dispatch({type: "USER_ADDRESS", payload: data});
         dispatch({ type: "IS_SUCCESS" });
     } catch (error) {
@@ -302,38 +303,35 @@ export const getUserCart = () => async (dispatch, getState) => {
 };
 
 
+// Checkout step 1: ask the server to start a Stripe payment. We send only the address;
+// the server works out the amount from the cart. Each call starts a fresh payment, so the
+// amount always matches the cart as it is now.
 export const createStripePaymentSecret 
-    = (sendData) => async (dispatch, getState) => {
+    = (sendData) => async (dispatch) => {
         try {
+            dispatch({ type: "CLIENT_SECRET", payload: null });
             dispatch({ type: "IS_FETCHING" });
             const { data } = await api.post("/order/stripe-client-secret", sendData);
             dispatch({ type: "CLIENT_SECRET", payload: data });
-              localStorage.setItem("client-secret", JSON.stringify(data));
-              dispatch({ type: "IS_SUCCESS" });
+            dispatch({ type: "IS_SUCCESS" });
         } catch (error) {
             console.log(error);
-            toast.error(error?.response?.data?.message || "Failed to create client secret");
+            const message = error?.response?.data?.message || "Couldn't start the payment";
+            dispatch({ type: "IS_ERROR", payload: message });
+            toast.error(message);
         }
 };
 
-
-export const stripePaymentConfirmation 
-    = (sendData, setErrorMesssage, setLoadng, toast) => async (dispatch, getState) => {
-        try {
-            const response  = await api.post("/order/users/payments/online", sendData);
-            if (response.data) {
-                localStorage.removeItem("CHECKOUT_ADDRESS");
-                localStorage.removeItem("cartItems");
-                localStorage.removeItem("client-secret");
-                dispatch({ type: "REMOVE_CLIENT_SECRET_ADDRESS"});
-                dispatch({ type: "CLEAR_CART"});
-                toast.success("Order Accepted");
-              } else {
-                setErrorMesssage("Payment Failed. Please try again.");
-              }
-        } catch (error) {
-            setErrorMesssage("Payment Failed. Please try again.");
-        }
+// Checkout step 3: back from Stripe. The server checks the payment with Stripe and
+// returns the order. Errors are passed on to the confirmation page to show.
+export const confirmStripePayment = (paymentIntentId) => async (dispatch) => {
+    const { data } = await api.post("/order/stripe/confirm", { paymentIntentId });
+    localStorage.removeItem("CHECKOUT_ADDRESS");
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("client-secret");
+    dispatch({ type: "REMOVE_CLIENT_SECRET_ADDRESS" });
+    dispatch({ type: "CLEAR_CART" });
+    return data;
 };
 
 export const analyticsAction = () => async (dispatch, getState) => {

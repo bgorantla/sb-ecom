@@ -1,6 +1,5 @@
 import { Skeleton } from '@mui/material';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import React from 'react'
 import { useState } from 'react';
 
 const PaymentForm = ({ clientSecret, totalPrice }) => {
@@ -14,13 +13,19 @@ const PaymentForm = ({ clientSecret, totalPrice }) => {
             return;
         }
 
+        // Checks the card form; stop here if something's missing
         const { error: submitError } = await elements.submit();
+        if (submitError) {
+            setErrorMessage(submitError.message);
+            return;
+        }
 
         const { error } = await stripe.confirmPayment({
             elements,
             clientSecret,
             confirmParams: {
-                return_url: `${import.meta.env.VITE_FRONTEND_URL}/order-confirm`,
+                // Wherever the site is running (CloudFront address, custom domain, localhost)
+                return_url: `${window.location.origin}/order-confirm`,
             },
         });
 

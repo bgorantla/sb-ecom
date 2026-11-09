@@ -1,7 +1,7 @@
-import { Alert, AlertTitle, Skeleton } from '@mui/material'
+import { Alert, Skeleton } from '@mui/material'
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import PaymentForm from './PaymentForm';
 import { createStripePaymentSecret } from '../../store/actions';
@@ -10,27 +10,18 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const StripePayment = () => {
   const dispatch = useDispatch();
-  const { clientSecret } = useSelector((state) => state.auth);
+  const { clientSecret, selectedUserCheckoutAddress } = useSelector((state) => state.auth);
   const { totalPrice } = useSelector((state) => state.carts);
   const { isLoading, errorMessage } = useSelector((state) => state.errors);
-  const { user, selectedUserCheckoutAddress } = useSelector((state) => state.auth);
+  const addressId = selectedUserCheckoutAddress?.addressId;
 
+  // Start a new payment each time this step opens. Only the address is sent:
+  // the server decides how much to charge from the cart it has stored.
   useEffect(() => {
-    if (!clientSecret) {
-    const sendData = {
-      amount: Number(totalPrice) * 100,
-      currency: "usd",
-      email: user.email,
-      name: `${user.username}`,
-      address: selectedUserCheckoutAddress,
-      description: `Order for ${user.email}`,
-      metadata: {
-        test: "1"
-      }
-    };
-      dispatch(createStripePaymentSecret(sendData));
+    if (addressId) {
+      dispatch(createStripePaymentSecret({ addressId }));
     }
-  }, [clientSecret]);
+  }, [dispatch, addressId]);
 
   if (isLoading) {
     return (
@@ -40,11 +31,19 @@ const StripePayment = () => {
     )
   }
 
+  if (errorMessage) {
+    return (
+      <div className='max-w-lg mx-auto p-4'>
+        <Alert severity="error">{errorMessage}</Alert>
+      </div>
+    )
+  }
 
   return (
     <>
       {clientSecret && (
-        <Elements stripe={stripePromise} options={{ clientSecret }}>
+        // key: a new payment gets a fresh Stripe form
+        <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret }}>
           <PaymentForm clientSecret={clientSecret} totalPrice={totalPrice} />
         </Elements>
       )}

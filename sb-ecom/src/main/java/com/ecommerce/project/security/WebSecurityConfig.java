@@ -89,9 +89,16 @@ public class WebSecurityConfig {
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                // Everyone's carts and addresses: admins only (shoppers use /api/users/addresses)
+                                .requestMatchers(HttpMethod.GET, "/api/carts", "/api/addresses").hasRole("ADMIN")
                                 .requestMatchers("/api/seller/**").hasAnyRole("ADMIN","SELLER")
                                 //.requestMatchers("/api/admin/**").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
+                                // Stripe calls this without a login; it checks Stripe's signature instead
+                                .requestMatchers("/api/webhooks/**").permitAll()
+                                // Spring Boot forwards every failed request to /error to build the error
+                                // response. Without this, a 404 or a bad request body showed up as 401.
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/images/**").permitAll()

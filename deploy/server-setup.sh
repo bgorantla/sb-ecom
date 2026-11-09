@@ -49,6 +49,8 @@ JWT_SECRET=${JWT_SECRET}
 STRIPE_SECRET_KEY=sk_test_REPLACE_ME
 FRONTEND_URL=https://REPLACE_ME.cloudfront.net
 IMAGE_BASE_URL=/images
+# Stripe webhook signing secret (whsec_...); see "Stripe webhook" in deploy/README.md
+STRIPE_WEBHOOK_SECRET=
 # Password for the "admin" account, used only when the app first creates it
 ADMIN_PASSWORD=${ADMIN_PASSWORD}
 # Public demo: read-only demo admin + test-mode banner; no user1/seller1 accounts

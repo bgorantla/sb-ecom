@@ -2,16 +2,11 @@ package com.ecommerce.project.controller;
 
 import com.ecommerce.project.config.AppConstants;
 import com.ecommerce.project.payload.*;
-import com.ecommerce.project.security.services.UserDetailsImpl;
 import com.ecommerce.project.service.OrderService;
-import com.ecommerce.project.service.StripeService;
-import com.ecommerce.project.util.AuthUtil;
-import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
+import com.ecommerce.project.service.CheckoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,33 +16,22 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private AuthUtil authUtil;
 
     @Autowired
-    private StripeService stripeService;
+    private CheckoutService checkoutService;
 
-    @PostMapping("/order/users/payments/{paymentMethod}")
-    public ResponseEntity<OrderDTO> orderProducts(@PathVariable String paymentMethod, @RequestBody OrderRequestDTO orderRequestDTO) {
-        String emailId = authUtil.loggedInEmail();
-        System.out.println("orderRequestDTO DATA: " + orderRequestDTO);
-        OrderDTO order = orderService.placeOrder(
-                emailId,
-                orderRequestDTO.getAddressId(),
-                paymentMethod,
-                orderRequestDTO.getPgName(),
-                orderRequestDTO.getPgPaymentId(),
-                orderRequestDTO.getPgStatus(),
-                orderRequestDTO.getPgResponseMessage()
-        );
-        return new ResponseEntity<>(order, HttpStatus.CREATED);
+    // Checkout step 1: the browser sends only the delivery address. The server works out the
+    // amount from the cart and returns the client secret for Stripe's payment form.
+    @PostMapping("/order/stripe-client-secret")
+    public ResponseEntity<String> createStripeClientSecret(@RequestBody StartPaymentRequest request) {
+        return new ResponseEntity<>(checkoutService.startPayment(request.addressId()), HttpStatus.CREATED);
     }
 
-    @PostMapping("/order/stripe-client-secret")
-    public ResponseEntity<String> createStripeClientSecret(@RequestBody StripePaymentDto stripePaymentDto) throws StripeException {
-        System.out.println("StripePaymentDTO Received " + stripePaymentDto);
-        PaymentIntent paymentIntent = stripeService.paymentIntent(stripePaymentDto);
-        return new ResponseEntity<>(paymentIntent.getClientSecret(), HttpStatus.CREATED);
+    // Checkout step 3: back from Stripe. The server checks the payment with Stripe before
+    // creating the order. (Before this, the browser could just say "payment succeeded".)
+    @PostMapping("/order/stripe/confirm")
+    public ResponseEntity<OrderDTO> confirmStripePayment(@RequestBody ConfirmPaymentRequest request) {
+        return new ResponseEntity<>(checkoutService.completePayment(request.paymentIntentId()), HttpStatus.CREATED);
     }
 
     @GetMapping("/admin/orders")

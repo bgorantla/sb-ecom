@@ -6,10 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Spinners from '../shared/Spinners';
 import toast from 'react-hot-toast';
 import { addUpdateUserAddress } from '../../store/actions';
+import useDemoInfo from '../../hooks/useDemoInfo';
 
 const AddAddressForm = ({ address, setOpenAddressModal }) => {
     const dispatch = useDispatch();
     const { btnLoader } = useSelector((state) => state.errors);
+    const demo = useDemoInfo();
     const {
             register,
             handleSubmit,
@@ -54,6 +56,12 @@ const AddAddressForm = ({ address, setOpenAddressModal }) => {
                         }
                         
                     </div>
+            {demo.enabled && (
+                // The public demo admin can see orders, including their delivery address
+                <p className="text-sm text-amber-900 bg-amber-100 rounded-md px-3 py-2 mb-4">
+                    This is a demo store: please use a made-up address.
+                </p>
+            )}
             <div className="flex flex-col gap-4">
                 <InputField
                     label="Building Name"

@@ -6,6 +6,7 @@ import com.ecommerce.project.model.User;
 import com.ecommerce.project.payload.AddressDTO;
 import com.ecommerce.project.repositories.AddressRepository;
 import com.ecommerce.project.repositories.UserRepository;
+import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,18 @@ public class AddressServiceImpl implements AddressService{
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    private AuthUtil authUtil;
+
+    // Loads an address only if it belongs to the logged-in user. Someone else's address gets
+    // the same "not found" as a missing one, so other people's address ids can't be probed.
+    private Address findOwnAddress(Long addressId) {
+        Long userId = authUtil.loggedInUserId();
+        return addressRepository.findById(addressId)
+                .filter(address -> address.getUser() != null && address.getUser().getUserId().equals(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+    }
 
     @Override
     public AddressDTO createAddress(AddressDTO addressDTO, User user) {
@@ -44,8 +57,7 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO getAddressesById(Long addressId) {
-        Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+        Address address = findOwnAddress(addressId);
         return modelMapper.map(address, AddressDTO.class);
     }
 
@@ -59,8 +71,7 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
-        Address addressFromDatabase = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+        Address addressFromDatabase = findOwnAddress(addressId);
 
         addressFromDatabase.setCity(addressDTO.getCity());
         addressFromDatabase.setPincode(addressDTO.getPincode());
@@ -81,8 +92,7 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public String deleteAddress(Long addressId) {
-        Address addressFromDatabase = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+        Address addressFromDatabase = findOwnAddress(addressId);
 
         User user = addressFromDatabase.getUser();
         user.getAddresses().removeIf(address -> address.getAddressId().equals(addressId));

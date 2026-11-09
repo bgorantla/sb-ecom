@@ -25,6 +25,7 @@ and the frontend is built with an empty `VITE_BACK_END_URL` (it calls `/api` on 
 | `demo/save-snapshot.sh` | server | Saves the store as the state the nightly reset returns to |
 | `demo/reset.sh` | server, nightly | Restores that snapshot (run by `sb-ecom-demo-reset.timer` at 08:00 UTC) |
 | `change-password.sh` | laptop | Sets a user's password in the server DB (e.g. `admin`) |
+| `set-env.sh` | laptop | Sets one value in `/etc/sb-ecom.env` (e.g. `STRIPE_WEBHOOK_SECRET`) and restarts the backend |
 | `sb-ecom.service` | server | systemd unit, heap sized for 1 GB RAM |
 | `nginx-sb-ecom.conf` | server | Static files + reverse proxy |
 | `frontend.env.production` | laptop | Template: copy to `ecom-frontend/.env.production` and fill in |
@@ -43,6 +44,21 @@ ssh sb-ecom 'sudo /opt/sb-ecom/demo/save-snapshot.sh'          # keep catalog ch
 
 The store goes back to its saved snapshot every night. If you change the catalog on purpose
 (as your own `admin`), run `save-snapshot.sh` afterwards or the next reset will undo it.
+
+## Stripe webhook
+
+Checkout works without it, but the webhook also creates the order when a shopper pays and closes
+the tab before Stripe sends them back to the site.
+
+1. In the Stripe dashboard (test mode), open **Developers → Webhooks** and add an endpoint
+   (newer dashboards call it an *event destination*):
+   - URL: `https://<your-site>/api/webhooks/stripe`
+   - event: `payment_intent.succeeded`
+2. Copy its **signing secret** (`whsec_...`) and put it on the server:
+   `bash deploy/set-env.sh sb-ecom STRIPE_WEBHOOK_SECRET`
+3. Stripe's dashboard shows each delivery and our answer. 200 means received.
+
+Until the secret is set, the endpoint answers 503 and nothing else changes.
 
 ## Where things live on the server
 

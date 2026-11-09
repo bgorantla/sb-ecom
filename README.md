@@ -36,12 +36,44 @@ flowchart LR
     N -->|/api, /images| S[Spring Boot :8080]
     S --> P[(PostgreSQL)]
     S -->|payments| ST[Stripe]
+    ST -.->|webhook| CF
 ```
 
 The site and the API share one address: Nginx serves the React build and forwards `/api` and `/images`
 to Spring Boot. That keeps the login cookie same-origin, so no CORS setup is needed in production.
 Spring Boot and PostgreSQL only listen on localhost. Everything runs on one small instance for about
 $9/month; see [deploy/README.md](deploy/README.md).
+
+## How checkout works
+
+The browser never tells the server how much to charge or whether a payment succeeded.
+
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant S as Spring Boot
+    participant St as Stripe
+    B->>S: POST /api/order/stripe-client-secret {addressId}
+    S->>S: total = cart items in the database
+    S->>St: create PaymentIntent (amount, metadata: user + address)
+    S-->>B: client secret
+    B->>St: card details, in Stripe's own form
+    St-->>B: redirect to /order-confirm?payment_intent=pi_...
+    B->>S: POST /api/order/stripe/confirm {paymentIntentId}
+    S->>St: fetch the PaymentIntent: status, amount, metadata
+    S->>S: lock cart, check amount, take stock, create order
+    St->>S: webhook payment_intent.succeeded (signed)
+    S->>S: same steps, finds the existing order, creates nothing
+```
+
+- **One order per payment.** The confirm call and the webhook can arrive together. Both lock the
+  shopper's cart row (`SELECT ... FOR UPDATE`), and the second one finds the order the first created.
+- **No overselling.** Stock is taken with `UPDATE ... SET quantity = quantity - n WHERE quantity >= n`,
+  which fails instead of going negative when two people buy the last item.
+- **Refunds.** If a paid cart can't become an order (an item sold out, or the cart changed during
+  payment), the payment is refunded automatically and the shopper is told why.
+- **Webhook** at `/api/webhooks/stripe`: needs no login, but every call must carry a valid Stripe
+  signature. It catches payments whose shopper closed the tab before coming back.
 
 ## Changes beyond the course
 
@@ -65,6 +97,14 @@ Changes since then:
   [a seed script](deploy/demo/seed_catalog.py)
 - **Fixed checkout for shoppers**: the route guard sent anyone without an admin or seller role
   away from checkout. Logging in now also returns you to the page you were on.
+- **Secure checkout** ([CheckoutService](sb-ecom/src/main/java/com/ecommerce/project/service/CheckoutService.java)):
+  - the original code took the amount from the browser and created the order when the browser said
+    "payment succeeded"
+  - now works as described in [How checkout works](#how-checkout-works)
+- **Closed data leaks**: any logged-in user could list everyone's addresses and carts, and read, edit
+  or delete other people's addresses. Errors on protected endpoints also came back as 401 instead
+  of their real status.
+- **Honest confirmation page**: it used to say "Payment Successful!" whatever happened
 - **Smaller fixes**: home banners whose text didn't match their pictures, stretched product photos,
   the 1 MB upload limit, and startup accounts with public passwords (now configurable and off on the server)
 
