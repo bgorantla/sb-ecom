@@ -10,5 +10,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
+    // Let Vite bundle the loading spinner for tests, as it does for the browser. Run by Node
+    // directly, newer styled-components versions (which it uses) fail with "styled.div is not a function".
+    server: { deps: { inline: ['react-loader-spinner'] } },
   },
 })
