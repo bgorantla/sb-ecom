@@ -1,4 +1,3 @@
-import React from 'react'
 import { formatPriceCalculation } from '../../utils/formatPrice'
 
 const OrderSummary = ({ totalPrice, cart, address, paymentMethod}) => {

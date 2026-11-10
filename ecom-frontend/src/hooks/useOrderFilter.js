@@ -24,7 +24,7 @@ const useOrderFilter = () => {
         
         dispatch(getOrdersForDashboard(queryString, isAdmin));
 
-    }, [dispatch, searchParams]);
+    }, [dispatch, searchParams, isAdmin]);
 };
 
 export default useOrderFilter;

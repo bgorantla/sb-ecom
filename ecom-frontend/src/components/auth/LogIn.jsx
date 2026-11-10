@@ -117,7 +117,7 @@ const LogIn = () => {
             )}
 
             <p className="text-center text-sm text-slate-700 mt-6">
-              Don't have an account?
+              Don’t have an account?
               <Link
                 className="font-semibold underline hover:text-black"
                 to="/register">

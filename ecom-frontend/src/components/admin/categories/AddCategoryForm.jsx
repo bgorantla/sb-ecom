@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
@@ -37,7 +37,7 @@ const AddCategoryForm = ({ setOpen, open, category, update = false }) => {
     if (update && category) {
       setValue("categoryName", category?.categoryName);
     }
-  }, [update, category]);
+  }, [update, category, setValue]);
 
   return (
     <div className="py-5 relative h-full ">

@@ -1,5 +1,7 @@
 # E-Shop
 
+[![CI/CD](https://github.com/bgorantla/sb-ecom/actions/workflows/ci.yml/badge.svg)](https://github.com/bgorantla/sb-ecom/actions/workflows/ci.yml)
+
 A full-stack online store built with **Spring Boot** and **React**, running on **AWS**.
 Shoppers browse and pay, sellers manage their own products, and admins run the catalog.
 
@@ -25,6 +27,7 @@ Shoppers browse and pay, sellers manage their own products, and admins run the c
 | Backend | Java 21, Spring Boot 4, Spring Security with JWT (in a cookie), Spring Data JPA / Hibernate, PostgreSQL, Stripe API, springdoc OpenAPI |
 | Frontend | React 19, Redux Toolkit, React Router 7, Tailwind CSS 4, Material UI, Vite 7 |
 | Infrastructure | AWS EC2 (t4g.micro, Ubuntu 24.04), Amazon CloudFront, Nginx, systemd, Bash deploy scripts |
+| Testing and CI/CD | JUnit 6, Spring Boot Test with MockMvc, H2, Vitest, React Testing Library, GitHub Actions with AWS OIDC |
 
 ## Architecture
 
@@ -105,12 +108,16 @@ Changes since then:
   or delete other people's addresses. Errors on protected endpoints also came back as 401 instead
   of their real status.
 - **Honest confirmation page**: it used to say "Payment Successful!" whatever happened
+- **Tests and CI/CD**: see [Tests](#tests). GitHub Actions runs them on every push and pull request,
+  and deploys to EC2 when they pass on master. The tests turned up bugs that are now fixed: the
+  admin "all carts" endpoint answered 400 or 302 instead of 200, a crash in the product form's error
+  handling, and a product popup that wouldn't close on Esc or an outside click
 - **Smaller fixes**: home banners whose text didn't match their pictures, stretched product photos,
   the 1 MB upload limit, and startup accounts with public passwords (now configurable and off on the server)
 
 ## Running it locally
 
-You need Java 21, Node.js 20+ and PostgreSQL.
+You need Java 21, Node.js 22.12+ and PostgreSQL.
 
 **Database**
 
@@ -151,12 +158,44 @@ npm run dev
 
 Pay with Stripe's test card `4242 4242 4242 4242`, any future expiry date and any CVC.
 
+## Tests
+
+```bash
+cd sb-ecom && ./mvnw test          # backend: about 30 tests, under a minute
+cd ecom-frontend && npm test       # frontend: lint is separate (npm run lint)
+```
+
+**Backend.** The API tests start the whole app (security filters, controllers, services, an
+in-memory H2 database) and call it over HTTP the way the browser does, signed in with a real JWT
+cookie. Only Stripe is replaced, by [FakeStripe](sb-ecom/src/test/java/com/ecommerce/project/support/FakeStripe.java),
+which lets a test decide whether each payment succeeds while checking webhook signatures with
+Stripe's real code.
+
+- [CheckoutApiTest](sb-ecom/src/test/java/com/ecommerce/project/checkout/CheckoutApiTest.java):
+  the server sets the amount, nobody can claim another shopper's payment, forged webhooks are
+  rejected, the last item in stock goes to one buyer and the other is refunded, and eight
+  simultaneous reports of one payment create exactly one order
+- [AccessRulesTest](sb-ecom/src/test/java/com/ecommerce/project/security/AccessRulesTest.java):
+  shoppers can't see or change each other's addresses, and admin-only endpoints are admin-only
+- [DemoModeTest](sb-ecom/src/test/java/com/ecommerce/project/demo/DemoModeTest.java):
+  the demo admin can look at everything and change nothing
+- [CartTotalsTest](sb-ecom/src/test/java/com/ecommerce/project/util/CartTotalsTest.java):
+  money in cents, rounded correctly
+
+Each safeguard was checked by removing it: without the cart lock, the concurrency test finds
+duplicate orders; without the stock check, the last-item test oversells.
+
+**Frontend.** [Vitest](https://vitest.dev) and React Testing Library render components in a fake
+browser page: the payment confirmation page (it waits for the server before saying "Order placed"),
+the search and filter bar, the cart reducer and price formatting.
+
 ## Project layout
 
 ```
 sb-ecom/          Spring Boot backend
 ecom-frontend/    React frontend
 deploy/           AWS server setup and deploy scripts
+.github/          GitHub Actions workflow: tests on every push, deploy from master
 ```
 
 ## Credits

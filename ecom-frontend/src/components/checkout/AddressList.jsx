@@ -1,4 +1,3 @@
-import React from 'react'
 import { FaBuilding, FaCheckCircle, FaEdit, FaStreetView, FaTrash } from 'react-icons/fa';
 import { MdLocationCity, MdPinDrop, MdPublic } from "react-icons/md";
 import { useDispatch, useSelector } from 'react-redux'

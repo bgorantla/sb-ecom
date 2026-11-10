@@ -8,7 +8,6 @@ const InputField = ({
     message,
     className,
     min,
-    value,
     placeholder,
 }) => {
     return (

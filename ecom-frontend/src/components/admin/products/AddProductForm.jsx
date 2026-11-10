@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import InputField from '../../shared/InputField';
 import { Button } from '@mui/material';
@@ -12,11 +12,13 @@ import ErrorPage from '../../shared/ErrorPage';
 
 const AddProductForm = ({ setOpen, product, update=false}) => {
 const [loader, setLoader] = useState(false);
-const [selectedCategory, setSelectedCategory] = useState();
+// Until the admin picks a category, the first one is selected
+const [chosenCategory, setChosenCategory] = useState();
 const { categories } = useSelector((state) => state.products);
 const { categoryLoader, errorMessage } = useSelector((state) => state.errors);
 const { user } = useSelector((state) => state.auth);
 const isAdmin = user && user?.roles?.includes("ROLE_ADMIN");
+const selectedCategory = chosenCategory ?? categories?.[0];
 
 const dispatch = useDispatch();
     const {
@@ -58,7 +60,7 @@ const dispatch = useDispatch();
             setValue("specialPrice", product?.specialPrice);
             setValue("description", product?.description);
         }
-    }, [update, product]);
+    }, [update, product, setValue]);
 
 
     useEffect(() => {
@@ -66,12 +68,6 @@ const dispatch = useDispatch();
             dispatch(fetchCategories());
         }
     }, [dispatch, update]);
-
-    useEffect(() => {
-        if (!categoryLoader && categories) {
-            setSelectedCategory(categories[0]);
-        }
-    }, [categories, categoryLoader]);
 
     if (categoryLoader) return <Skeleton />
     if (errorMessage) return <ErrorPage message={errorMessage} />
@@ -96,7 +92,7 @@ const dispatch = useDispatch();
                     <SelectTextField
                         label="Select Categories"
                         select={selectedCategory}
-                        setSelect={setSelectedCategory}
+                        setSelect={setChosenCategory}
                         lists={categories}
                     />
                 )}

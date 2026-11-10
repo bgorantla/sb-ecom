@@ -9,34 +9,37 @@ const Filter = ({ categories }) => {
     const pathname = useLocation().pathname;
     const navigate = useNavigate();
     
-    const [category, setCategory] = useState("all");
-    const [sortOrder, setSortOrder] = useState("asc");
-    const [searchTerm, setSearchTerm] = useState("");
+    // Category and sort order are read straight from the URL, so a filtered page can be
+    // bookmarked or shared, and the back button undoes a filter change.
+    const category = searchParams.get("category") || "all";
+    const sortOrder = searchParams.get("sortby") || "asc";
+
+    // The search box keeps what's being typed, and copies it to the URL after a 700 ms pause.
+    // When the URL's keyword changes some other way (Clear Filter, back button), the box follows.
+    const urlKeyword = searchParams.get("keyword") || "";
+    const [searchTerm, setSearchTerm] = useState(urlKeyword);
+    const [lastUrlKeyword, setLastUrlKeyword] = useState(urlKeyword);
+    if (urlKeyword !== lastUrlKeyword) {
+        setLastUrlKeyword(urlKeyword);
+        setSearchTerm(urlKeyword);
+    }
 
     useEffect(() => {
-        const currentCategory = searchParams.get("category") || "all";
-        const currentSortOrder = searchParams.get("sortby") || "asc";
-        const currentSearchTerm = searchParams.get("keyword") || "";
-
-        setCategory(currentCategory);
-        setSortOrder(currentSortOrder);
-        setSearchTerm(currentSearchTerm);
-    }, [searchParams]);
-
-    useEffect(() => { 
+        if (searchTerm === urlKeyword) return;   // already in the URL: nothing to do
         const handler = setTimeout(() => {
+            const next = new URLSearchParams(searchParams);
             if (searchTerm) {
-                searchParams.set("keyword", searchTerm);
+                next.set("keyword", searchTerm);
             } else {
-                searchParams.delete("keyword");
+                next.delete("keyword");
             }
-            navigate(`${pathname}?${searchParams.toString()}`);
+            navigate(`${pathname}?${next.toString()}`);
         }, 700);
 
         return () => {
             clearTimeout(handler);
         };
-    }, [searchParams, searchTerm, navigate, pathname]);
+    }, [searchParams, searchTerm, urlKeyword, navigate, pathname]);
 
     const handleCategoryChange = (event) => {
         const selectedCategory = event.target.value;
@@ -47,20 +50,15 @@ const Filter = ({ categories }) => {
             params.set("category", selectedCategory);
         }
         navigate(`${pathname}?${params}`);
-        setCategory(event.target.value);
     };
 
     const toggleSortOrder = () => {
-        setSortOrder((prevOrder) => {
-            const newOrder = (prevOrder === "asc") ?  "desc" : "asc";
-            params.set("sortby", newOrder);
-            navigate(`${pathname}?${params}`);
-            return newOrder;
-        })
+        params.set("sortby", sortOrder === "asc" ? "desc" : "asc");
+        navigate(`${pathname}?${params}`);
     };
 
     const handleClearFilters = () => {
-        navigate({ pathname : window.location.pathname });
+        navigate(pathname);
     };
 
     return (
@@ -100,7 +98,7 @@ const Filter = ({ categories }) => {
                 </FormControl>
 
                 {/* SORT BUTTON & CLEAR FILTER */}
-                <Tooltip title="Sorted by price: asc">
+                <Tooltip title={`Sorted by price: ${sortOrder}`}>
                     <Button variant="contained" 
                         onClick={toggleSortOrder}
                         color="primary" 

@@ -155,7 +155,7 @@ export const loginAsDemoShopper = (toast, navigate, setLoader) => async (dispatc
 };
 
 export const registerNewUser 
-    = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {
+    = (sendData, toast, reset, navigate, setLoader) => async () => {
         try {
             setLoader(true);
             const { data } = await api.post("/auth/signup", sendData);
@@ -178,7 +178,7 @@ export const logOutUser = (navigate) => (dispatch) => {
 };
 
 export const addUpdateUserAddress =
-     (sendData, toast, addressId, setOpenAddressModal) => async (dispatch, getState) => {
+     (sendData, toast, addressId, setOpenAddressModal) => async (dispatch) => {
     /*
     const { user } = getState().auth;
     await api.post(`/addresses`, sendData, {
@@ -188,7 +188,7 @@ export const addUpdateUserAddress =
     dispatch({ type:"BUTTON_LOADER" });
     try {
         if (!addressId) {
-            const { data } = await api.post("/addresses", sendData);
+            await api.post("/addresses", sendData);
         } else {
             await api.put(`/addresses/${addressId}`, sendData);
         }
@@ -206,7 +206,7 @@ export const addUpdateUserAddress =
 
 
 export const deleteUserAddress = 
-    (toast, addressId, setOpenDeleteModal) => async (dispatch, getState) => {
+    (toast, addressId, setOpenDeleteModal) => async (dispatch) => {
     try {
         dispatch({ type: "BUTTON_LOADER" });
         await api.delete(`/addresses/${addressId}`);
@@ -231,7 +231,7 @@ export const clearCheckoutAddress = () => {
     }
 };
 
-export const getUserAddresses = () => async (dispatch, getState) => {
+export const getUserAddresses = () => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
         // Only this user's addresses (/addresses lists everyone's and is admin-only)
@@ -265,7 +265,7 @@ export const addPaymentMethod = (method) => {
 };
 
 
-export const createUserCart = (sendCartItems) => async (dispatch, getState) => {
+export const createUserCart = (sendCartItems) => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
         await api.post('/cart/create', sendCartItems);
@@ -317,8 +317,8 @@ export const createStripePaymentSecret
         } catch (error) {
             console.log(error);
             const message = error?.response?.data?.message || "Couldn't start the payment";
+            // StripePayment shows this message in place of the payment form
             dispatch({ type: "IS_ERROR", payload: message });
-            toast.error(message);
         }
 };
 
@@ -334,7 +334,7 @@ export const confirmStripePayment = (paymentIntentId) => async (dispatch) => {
     return data;
 };
 
-export const analyticsAction = () => async (dispatch, getState) => {
+export const analyticsAction = () => async (dispatch) => {
         try {
             dispatch({ type: "IS_FETCHING"});
             const { data } = await api.get('/admin/app/analytics');
@@ -378,7 +378,7 @@ export const getOrdersForDashboard = (queryString, isAdmin) => async (dispatch) 
 
 
 export const updateOrderStatusFromDashboard =
-     (orderId, orderStatus, toast, setLoader, isAdmin) => async (dispatch, getState) => {
+     (orderId, orderStatus, toast, setLoader, isAdmin) => async (dispatch) => {
     try {
         setLoader(true);
         const endpoint = isAdmin ? "/admin/orders/" : "/seller/orders/";
@@ -439,7 +439,7 @@ export const updateProductFromDashboard =
 
 
 export const addNewProductFromDashboard = 
-    (sendData, toast, reset, setLoader, setOpen, isAdmin) => async(dispatch, getState) => {
+    (sendData, toast, reset, setLoader, setOpen, isAdmin) => async (dispatch) => {
         try {
             setLoader(true);
             const endpoint = isAdmin ? "/admin/categories/" : "/seller/categories/";
@@ -451,15 +451,15 @@ export const addNewProductFromDashboard =
             setOpen(false);
             await dispatch(dashboardProductsAction());
         } catch (error) {
-            console.error(err);
-            toast.error(err?.response?.data?.description || "Product creation failed");
+            console.error(error);
+            toast.error(error?.response?.data?.message || "Product creation failed");
         } finally {
             setLoader(false);
         }
     }
 
 export const deleteProduct = 
-    (setLoader, productId, toast, setOpenDeleteModal, isAdmin) => async (dispatch, getState) => {
+    (setLoader, productId, toast, setOpenDeleteModal, isAdmin) => async (dispatch) => {
     try {
         setLoader(true)
         const endpoint = isAdmin ? "/admin/products/" : "/seller/products/";
@@ -519,7 +519,7 @@ export const getAllCategoriesDashboard = (queryString) => async (dispatch) => {
 };
 
 export const createCategoryDashboardAction =
-  (sendData, setOpen, reset, toast) => async (dispatch, getState) => {
+  (sendData, setOpen, reset, toast) => async (dispatch) => {
     try {
       dispatch({ type: "CATEGORY_LOADER" });
       await api.post("/admin/categories", sendData);
@@ -543,7 +543,7 @@ export const createCategoryDashboardAction =
 
 export const updateCategoryDashboardAction =
   (sendData, setOpen, categoryID, reset, toast) =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     try {
       dispatch({ type: "CATEGORY_LOADER" });
 
@@ -569,7 +569,7 @@ export const updateCategoryDashboardAction =
   };
 
 export const deleteCategoryDashboardAction =
-  (setOpen, categoryID, toast) => async (dispatch, getState) => {
+  (setOpen, categoryID, toast) => async (dispatch) => {
     try {
       dispatch({ type: "CATEGORY_LOADER" });
 
@@ -592,8 +592,7 @@ export const deleteCategoryDashboardAction =
 
 
   export const getAllSellersDashboard =
-  (queryString) => async (dispatch, getState) => {
-    const { user } = getState().auth;
+  (queryString) => async (dispatch) => {
     try {
       dispatch({ type: "IS_FETCHING" });
       const { data } = await api.get(`/auth/sellers?${queryString}`);

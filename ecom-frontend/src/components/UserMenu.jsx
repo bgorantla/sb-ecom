@@ -1,4 +1,4 @@
-import { Avatar, Button, Menu, MenuItem } from '@mui/material';
+import { Avatar, Menu, MenuItem } from '@mui/material';
 import React from 'react'
 import { BiUser } from 'react-icons/bi';
 import { FaShoppingCart, FaUserShield } from 'react-icons/fa';

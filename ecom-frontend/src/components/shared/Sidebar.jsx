@@ -1,11 +1,10 @@
-import React from 'react'
 import { FaTachometerAlt } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom'
 import { adminNavigation, sellerNavigation } from '../../utils';
 import classNames from 'classnames';
 
-const Sidebar = ({isProfileLayout = false}) => {
+const Sidebar = () => {
     const pathName = useLocation().pathname;
     const { user } = useSelector((state) => state.auth);
 

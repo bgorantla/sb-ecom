@@ -93,11 +93,8 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public List<CartDTO> getAllCarts() {
+        // No carts is an empty list, not an error
         List<Cart> carts = cartRepository.findAll();
-
-        if (carts.size() == 0) {
-            throw new APIException("No cart exists");
-        }
 
         List<CartDTO> cartDTOs = carts.stream().map(cart -> {
             CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);

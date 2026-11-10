@@ -1,4 +1,3 @@
-import React from 'react'
 import { FaShoppingCart } from 'react-icons/fa';
 import OrderTable from './OrderTable';
 import { useSelector } from 'react-redux';

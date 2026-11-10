@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Sidebar from '../shared/Sidebar'
 import { Outlet } from 'react-router-dom'
-import { Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react';
+import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react';
 import { RxCross1 } from 'react-icons/rx';
 import { FaBars } from 'react-icons/fa';
 import { useSelector } from 'react-redux';

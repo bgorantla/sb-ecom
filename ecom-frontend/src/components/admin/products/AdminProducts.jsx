@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { MdAddShoppingCart } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../shared/Loader';
@@ -20,7 +20,7 @@ const AdminProducts = () => {
   // const pagination = { pageNumber: 0, pageSize: 50, totalElements: 11, totalPages: 1, lastPage: true };
   
   const {products, pagination} = useSelector((state) => state.products);
-  const { isLoading, errorMessage } = useSelector((state) => state.errors);
+  const { isLoading } = useSelector((state) => state.errors);
   const [currentPage, setCurrentPage] = useState(
       pagination?.pageNumber + 1 || 1
     );

@@ -1,0 +1,158 @@
+# Runs on every push and pull request:
+#   backend   Maven compiles the Spring Boot app and runs its tests (H2 database, fake Stripe)
+#   frontend  ESLint, the Vitest tests and a production build of the React app
+# When both pass on master, "deploy" ships the new version to the EC2 server.
+# Setup for the deploy job: deploy/README.md, "Automatic deploys from GitHub".
+name: CI/CD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:   # adds a "Run workflow" button, e.g. to redeploy without a new commit
+
+# A new push to a branch cancels its older, still-running checks. Not on master: there a
+# run may be deploying, and stopping a deploy halfway is worse than letting it finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sb-ecom
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven   # reuse downloaded libraries between runs
+
+      # verify = compile, run every test, package the jar
+      - run: ./mvnw -B verify
+
+      - name: Keep the test reports if something failed
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-test-reports
+          path: sb-ecom/target/surefire-reports/
+
+  frontend:
+    name: Frontend lint, tests, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ecom-frontend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ecom-frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    name: Deploy to EC2
+    needs: [backend, frontend]
+    # Only for master (never for pull requests), and only once the setup is done
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && vars.EC2_HOST != ''
+    runs-on: ubuntu-latest
+    # The "production" environment only accepts master, and holds the SSH key. GitHub also
+    # lists each deploy, with a link to the site, on the repository's front page.
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write   # lets the job ask GitHub for an OIDC token, which AWS trades for temporary credentials
+    env:
+      SECURITY_GROUP_ID: ${{ vars.AWS_SECURITY_GROUP_ID }}
+      SITE_URL: ${{ vars.SITE_URL }}
+      STRIPE_PUBLISHABLE_KEY: ${{ vars.STRIPE_PUBLISHABLE_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ecom-frontend/package-lock.json
+
+      - name: Write the frontend's production settings
+        run: |
+          {
+            echo "VITE_BACK_END_URL="
+            echo "VITE_FRONTEND_URL=$SITE_URL"
+            echo "VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY"
+          } > ecom-frontend/.env.production
+
+      # No AWS keys are stored in GitHub. AWS checks GitHub's signed token (it must come from
+      # this repository's production environment) and hands out credentials that expire in an
+      # hour and can only add or remove rules in the server's security group.
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Set up SSH to the server
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          EC2_HOST: ${{ vars.EC2_HOST }}
+          EC2_HOST_KEY: ${{ vars.EC2_HOST_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          # The server's own key, saved during setup: SSH refuses to connect to anything else
+          printf '%s\n' "$EC2_HOST_KEY" > ~/.ssh/known_hosts
+          printf 'Host sb-ecom\n  HostName %s\n  User ubuntu\n  IdentityFile ~/.ssh/deploy_key\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n  ConnectTimeout 10\n' \
+            "$EC2_HOST" > ~/.ssh/config
+
+      - name: Open SSH for this runner's IP only
+        run: |
+          RUNNER_IP=$(curl -sf https://checkip.amazonaws.com)
+          echo "RUNNER_IP=$RUNNER_IP" >> "$GITHUB_ENV"
+          aws ec2 authorize-security-group-ingress --group-id "$SECURITY_GROUP_ID" \
+            --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=$RUNNER_IP/32,Description=GitHub Actions deploy}]" \
+            > /dev/null
+          for _ in $(seq 1 10); do ssh sb-ecom true && exit 0; sleep 3; done
+          echo "Can't reach the server over SSH" >&2; exit 1
+
+      # Same script as a deploy from your laptop: build, upload, restart, wait for the API
+      - name: Deploy
+        run: bash deploy/deploy.sh sb-ecom
+
+      - name: Close SSH again
+        if: always() && env.RUNNER_IP != ''
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id "$SECURITY_GROUP_ID" \
+            --protocol tcp --port 22 --cidr "$RUNNER_IP/32" > /dev/null
+
+      - name: Check the live site
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL/api/public/products")
+          echo "GET /api/public/products -> $code"
+          [ "$code" = 200 ]

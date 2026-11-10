@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { sellerTableColumns } from "../../helper/tableColumn";
